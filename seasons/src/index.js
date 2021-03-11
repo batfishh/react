@@ -1,13 +1,18 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import SeasonDisplay from "./SeasonDisplay";
+import Loading from "./Loading";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { lat: null, long: null, errorMessage: "" };
+  }
+
+  state = { lat: null, long: null, errorMessage: "" };
+
+  componentDidMount() {
     window.navigator.geolocation.getCurrentPosition(
       (pos) => {
-        console.log(pos);
         this.setState({ lat: pos.coords.latitude, long: pos.coords.longitude });
       },
       (err) => {
@@ -15,34 +20,26 @@ class App extends React.Component {
       }
     );
   }
-  
-  componentDidMount(){
-      console.log("MOUNTED")
+
+  componentDidUpdate() {
+    console.log("Updated");
   }
 
-
-  
-  componentDidUpdate(){
-    console.log("Updated")
-}
-
-  render() {
-    if (!this.state.errorMessage && !this.state.lat && !this.state.long) {
-      return <div>LOADING.....</div>;
+  renderContent() {
+    if (!this.state.errorMessage && !this.state.lat) {
+      return <Loading />;
     }
 
-    if (!this.state.errorMessage && this.state.lat && this.state.long) {
-      return (
-        <div>
-          Latitude : {this.state.lat}, Longitude : {this.state.long}
-        </div>
-      );
+    if (!this.state.errorMessage && this.state.lat) {
+      return <SeasonDisplay lat={this.state.lat}></SeasonDisplay>;
     }
 
     if (this.state.errorMessage) {
       return <div>ERROR GETTING STUFF: {this.state.errorMessage};</div>;
     }
   }
+  render() {
+    return <div>{this.renderContent()}</div>;
+  }
 }
-
 ReactDOM.render(<App />, document.querySelector("#root"));
